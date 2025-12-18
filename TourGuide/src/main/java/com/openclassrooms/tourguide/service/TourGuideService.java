@@ -2,6 +2,7 @@ package com.openclassrooms.tourguide.service;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -9,7 +10,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -36,6 +40,7 @@ public class TourGuideService {
 	private final GpsUtil gpsUtil;
 	private final RewardsService rewardsService;
 	private final TripPricer tripPricer = new TripPricer();
+	private final ExecutorService executorService = Executors.newFixedThreadPool(1000);
 	public final Tracker tracker;
 	boolean testMode = true;
 
@@ -79,6 +84,17 @@ public class TourGuideService {
 		}
 	}
 
+	public void calculateRewards(List<User> users) {
+		List<CompletableFuture<Void>> futures = new ArrayList<>();
+		for (User user : users) {
+			CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
+				rewardsService.calculateRewards(user);
+			}, executorService);
+			futures.add(future);
+		}
+		CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+	}
+	
 	public List<Provider> getTripDeals(User user) {
 		int cumulatativeRewardPoints = user.getUserRewards().stream().mapToInt(i -> i.getRewardPoints()).sum();
 		List<Provider> providers = tripPricer.getPrice(tripPricerApiKey, user.getUserId(),
@@ -93,6 +109,17 @@ public class TourGuideService {
 		user.addToVisitedLocations(visitedLocation);
 		rewardsService.calculateRewards(user);
 		return visitedLocation;
+	}
+
+	public void trackUserLocation(List<User> users) {
+		List<CompletableFuture<Void>> futures = new ArrayList<>();
+		for (User user : users) {
+			CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
+				trackUserLocation(user);
+			}, executorService);
+			futures.add(future);
+		}
+		CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
 	}
 
 	public List<NearbyAttractionDTO> getNearByAttractions(VisitedLocation visitedLocation, User user) {
