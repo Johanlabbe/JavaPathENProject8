@@ -9,7 +9,14 @@ public class NearbyAttractionDTO {
     private double distanceMiles;
     private int rewardPoints;
 
-    public NearbyAttractionDTO(String attractionName, Location attractionLocation, Location userLocation, double distanceMiles, int rewardPoints) {
+    /**
+     * Data Transfer Object (DTO) representing a nearby attraction for a user.
+     * It contains the attraction details, the user's location, the distance between
+     * them,
+     * and the reward points associated with the attraction.
+     */
+    public NearbyAttractionDTO(String attractionName, Location attractionLocation, Location userLocation,
+            double distanceMiles, int rewardPoints) {
         this.attractionName = attractionName;
         this.attractionLocation = attractionLocation;
         this.userLocation = userLocation;

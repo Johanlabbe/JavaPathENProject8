@@ -15,10 +15,12 @@ public class User {
 	private String phoneNumber;
 	private String emailAddress;
 	private Date latestLocationTimestamp;
-	private List<VisitedLocation> visitedLocations = new CopyOnWriteArrayList<>();
 	private List<UserReward> userRewards = new ArrayList<>();
 	private UserPreferences userPreferences = new UserPreferences();
 	private List<Provider> tripDeals = new CopyOnWriteArrayList<>();
+	// Use CopyOnWriteArrayList to ensure thread safety when modifying lists concurrently
+    // (e.g., tracking location and calculating rewards simultaneously).
+	private List<VisitedLocation> visitedLocations = new CopyOnWriteArrayList<>();
 
 	public User(UUID userId, String userName, String phoneNumber, String emailAddress) {
 		this.userId = userId;

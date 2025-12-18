@@ -84,6 +84,12 @@ public class TourGuideService {
 		}
 	}
 
+	/**
+     * Calculates rewards for a list of users asynchronously.
+     * Similar to tracking, this uses the ExecutorService to process rewards in parallel.
+     *
+     * @param users The list of users for whom to calculate rewards.
+     */
 	public void calculateRewards(List<User> users) {
 		List<CompletableFuture<Void>> futures = new ArrayList<>();
 		for (User user : users) {
@@ -94,7 +100,7 @@ public class TourGuideService {
 		}
 		CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
 	}
-	
+
 	public List<Provider> getTripDeals(User user) {
 		int cumulatativeRewardPoints = user.getUserRewards().stream().mapToInt(i -> i.getRewardPoints()).sum();
 		List<Provider> providers = tripPricer.getPrice(tripPricerApiKey, user.getUserId(),
@@ -111,6 +117,13 @@ public class TourGuideService {
 		return visitedLocation;
 	}
 
+	/**
+     * Tracks the location of a list of users asynchronously using a thread pool.
+     * This method leverages CompletableFuture to execute tracking in parallel, 
+     * significantly improving performance for high volumes of users.
+     *
+     * @param users The list of users to track.
+     */
 	public void trackUserLocation(List<User> users) {
 		List<CompletableFuture<Void>> futures = new ArrayList<>();
 		for (User user : users) {
