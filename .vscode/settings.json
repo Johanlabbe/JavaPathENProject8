@@ -1,0 +1,8 @@
+{
+    "java.project.referencedLibraries": [
+        "C:/Users/Johan Labbe/Desktop/workspace/Java/OC/JavaPathENProject8/TourGuide/libs/*.jar"
+    ],
+    "java.project.sourcePaths": ["src"],
+    "java.project.outputPath": "bin",
+    "java.compile.nullAnalysis.mode": "automatic"
+}
