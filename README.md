@@ -5,7 +5,7 @@ TourGuide is a Spring Boot application that provides travel information and rewa
 ## Technologies
 
 > Java 17
-> Spring Boot 3.X
+> Spring Boot 3.1.1
 > JUnit 5
 > Maven
 
@@ -45,4 +45,8 @@ A new endpoint `/getNearbyAttractions` has been added. It returns the 5 closest 
 - Reward Points
 
 ## CI/CD
-A **GitHub Actions** pipeline is set up to automatically build the project and run unit tests on every push to the repository.
+The project’s industrialization is managed through two distinct **GitHub Actions** workflows to ensure code quality and streamlined delivery:
+
+**Continuous Integration (CI)**: The ci.yml workflow is triggered on every push and pull request. It handles environment setup, installs local dependencies, and executes unit and integration tests (excluding performance tests) to provide rapid feedback.
+
+**Continuous Deployment (CD)**: The cd.yml workflow is triggered only on the master and main branches. It packages the application and generates a downloadable Artifact (executable .jar file), making it ready for production deployment.
