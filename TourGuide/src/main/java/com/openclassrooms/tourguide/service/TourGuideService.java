@@ -2,7 +2,6 @@ package com.openclassrooms.tourguide.service;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -91,14 +90,11 @@ public class TourGuideService {
      * @param users The list of users for whom to calculate rewards.
      */
 	public void calculateRewards(List<User> users) {
-		List<CompletableFuture<Void>> futures = new ArrayList<>();
-		for (User user : users) {
-			CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
-				rewardsService.calculateRewards(user);
-			}, executorService);
-			futures.add(future);
-		}
-		CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+			CompletableFuture<?>[] futures = users.stream()
+					.map(user -> CompletableFuture.runAsync(() -> rewardsService.calculateRewards(user), executorService))
+					.toArray(CompletableFuture[]::new);
+
+			CompletableFuture.allOf(futures).join();
 	}
 
 	public List<Provider> getTripDeals(User user) {
@@ -125,15 +121,12 @@ public class TourGuideService {
      * @param users The list of users to track.
      */
 	public void trackUserLocation(List<User> users) {
-		List<CompletableFuture<Void>> futures = new ArrayList<>();
-		for (User user : users) {
-			CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
-				trackUserLocation(user);
-			}, executorService);
-			futures.add(future);
-		}
-		CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
-	}
+        CompletableFuture<?>[] futures = users.stream()
+                .map(user -> CompletableFuture.runAsync(() -> trackUserLocation(user), executorService))
+                .toArray(CompletableFuture[]::new);
+
+        CompletableFuture.allOf(futures).join();
+    }
 
 	public List<NearbyAttractionDTO> getNearByAttractions(VisitedLocation visitedLocation, User user) {
 		List<Attraction> allAttractions = gpsUtil.getAttractions();

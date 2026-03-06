@@ -1,6 +1,5 @@
 package com.openclassrooms.tourguide.user;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -15,7 +14,7 @@ public class User {
 	private String phoneNumber;
 	private String emailAddress;
 	private Date latestLocationTimestamp;
-	private List<UserReward> userRewards = new ArrayList<>();
+	private List<UserReward> userRewards = new CopyOnWriteArrayList<>();
 	private UserPreferences userPreferences = new UserPreferences();
 	private List<Provider> tripDeals = new CopyOnWriteArrayList<>();
 	// Use CopyOnWriteArrayList to ensure thread safety when modifying lists concurrently
@@ -73,9 +72,14 @@ public class User {
 		visitedLocations.clear();
 	}
 
-	public void addUserReward(UserReward userReward) {
-		userRewards.add(userReward);
-	}
+	public synchronized void addUserReward(UserReward userReward) {
+        boolean exists = userRewards.stream()
+                .anyMatch(r -> r.attraction.attractionName.equals(userReward.attraction.attractionName));
+        
+        if (!exists) {
+            userRewards.add(userReward);
+        }
+    }
 
 	public List<UserReward> getUserRewards() {
 		return userRewards;
